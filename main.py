@@ -1,36 +1,57 @@
-from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
-import sqlite3
-from typing import Generator
-from .ws_signaling import router as signaling_router
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Dict
 
 app = FastAPI()
 
-app.include_router(signaling_router)
+# Permitir CORS (ajustar orígenes según frontend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-DATABASE = "clivox.db"
+# Estructura para guardar conexiones: { sala_id: { user_id: websocket } }
+rooms: Dict[str, Dict[str, WebSocket]] = {}
 
-def get_db() -> Generator:
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+@app.websocket("/ws/{role}/{sala_id}/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, role: str, sala_id: str, user_id: str):
+    await websocket.accept()
+    if sala_id not in rooms:
+        rooms[sala_id] = {}
+    rooms[sala_id][user_id] = websocket
+
+    print(f"[WS] Usuario '{user_id}' ({role}) conectado a sala '{sala_id}'")
+
+    # Avisar a otros usuarios que llegó uno nuevo
+    for uid, ws in rooms[sala_id].items():
+        if uid != user_id:
+            await ws.send_text(f"NEW_USER::{user_id}")
+
     try:
-        yield conn
-    finally:
-        conn.close()
+        while True:
+            data = await websocket.receive_text()
+            # Formato esperado: tipo::destino_id::mensaje
+            parts = data.split("::", 2)
+            if len(parts) != 3:
+                continue
+            tipo, destino_id, mensaje = parts
 
-class Parametro(BaseModel):
-    clave: str
-    valor: str
+            # Reenviar al destinatario si está conectado
+            if destino_id in rooms[sala_id]:
+                await rooms[sala_id][destino_id].send_text(f"{tipo}::{user_id}::{mensaje}")
 
-@app.get("/parametros/{clave}", response_model=Parametro)
-def leer_parametro(clave: str, db=Depends(get_db)):
-    cursor = db.execute("SELECT clave, valor FROM parametros_clivox WHERE clave = ?", (clave,))
-    row = cursor.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="Parámetro no encontrado")
-    return {"clave": row["clave"], "valor": row["valor"]}
+    except WebSocketDisconnect:
+        print(f"[WS] Usuario '{user_id}' desconectado de sala '{sala_id}'")
+        del rooms[sala_id][user_id]
+        for uid, ws in rooms[sala_id].items():
+            await ws.send_text(f"USER_LEFT::{user_id}")
 
-@app.get("/salas/{sala_id}")
-def obtener_sala(sala_id: str):
-    # Por ahora mock simple, luego DB real
-    return {"sala_id": sala_id, "nombre": f"Sala {sala_id}"}
+        if not rooms[sala_id]:
+            del rooms[sala_id]
