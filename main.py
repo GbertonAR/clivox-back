@@ -1,6 +1,8 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
+from fastapi.responses import HTMLResponse
+from datetime import datetime
 
 app = FastAPI()
 
@@ -55,3 +57,45 @@ async def websocket_endpoint(websocket: WebSocket, role: str, sala_id: str, user
 
         if not rooms[sala_id]:
             del rooms[sala_id]
+
+@app.get("/", response_class=HTMLResponse)
+async def clivox_status():
+    now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    return f"""
+    <html>
+        <head>
+            <title>Clivox</title>
+            <style>
+                body {{
+                    background: linear-gradient(to right, #6a11cb, #2575fc);
+                    color: white;
+                    font-family: sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                }}
+                .card {{
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 2rem;
+                    border-radius: 1rem;
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+                    text-align: center;
+                }}
+                h1 {{
+                    margin-bottom: 1rem;
+                }}
+                p {{
+                    font-size: 1.2rem;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>✅ Clivox activo y funcionando</h1>
+                <p>🕒 {now}</p>
+            </div>
+        </body>
+    </html>
+    """
