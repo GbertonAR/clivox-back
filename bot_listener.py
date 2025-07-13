@@ -9,7 +9,8 @@ ACS_ENDPOINT = os.getenv("ACS_ENDPOINT", "https://acs-ansv-chat.unitedstates.com
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 THREAD_ID = os.getenv("THREAD_ID")
 BOT_ID = os.getenv("BOT_ID")
-BACKEND_BOT_URL = "http://127.0.0.1:8000/api/messages"
+#BACKEND_BOT_URL = "http://127.0.0.1:8000/api/messages"
+BACKEND_BOT_URL = os.getenv("BACKEND_BOT_URL", "https://clivox-backend-cea4bzfcahbpf9fw.westus-01.azurewebsites.net/api/messages")
 
 last_message_ids = set()
 
