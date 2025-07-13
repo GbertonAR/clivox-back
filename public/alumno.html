@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clase Online - Alumno</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f0f2f5; }
+    #login { max-width: 400px; margin: 3rem auto; padding: 1rem; background: white; border-radius: 8px; }
+    label { display: block; margin-top: 1rem; font-weight: bold; }
+    input, button, textarea { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+    #chat { max-width: 600px; margin: 1rem auto; background: white; border-radius: 8px; display: none; flex-direction: column; height: 80vh; }
+    #messages { flex-grow: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #ddd; }
+    .msg { margin-bottom: 0.8rem; }
+    .msg.bot { color: #0078d4; }
+    .msg.user { color: #333; }
+    #inputArea { display: flex; padding: 0.5rem; }
+    #inputArea textarea { resize: none; height: 50px; flex-grow: 1; }
+    #inputArea button { width: 100px; margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div id="login">
+    <h2>Ingresar a la Clase Online</h2>
+    <label for="username">Nombre de Usuario</label>
+    <input type="text" id="username" placeholder="Tu nombre" />
+
+    <label for="token">Token ACS</label>
+    <textarea id="token" placeholder="Pega aquí tu token ACS"></textarea>
+
+    <label for="threadId">Thread ID</label>
+    <input type="text" id="threadId" placeholder="ID del chat thread" />
+
+    <button id="btnConnect">Conectar</button>
+  </div>
+
+  <div id="chat" style="display:none; flex-direction: column;">
+    <div id="messages"></div>
+    <div id="inputArea">
+      <textarea id="msgInput" placeholder="Escribí tu mensaje..."></textarea>
+      <button id="btnSend">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    let token, threadId, username;
+    let lastMessageIds = new Set();
+    const endpointBase = new URL('', window.location.href).origin; // Ajustar si backend diferente
+
+    const headers = () => ({
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    });
+
+    document.getElementById('btnConnect').onclick = () => {
+      username = document.getElementById('username').value.trim();
+      token = document.getElementById('token').value.trim();
+      threadId = document.getElementById('threadId').value.trim();
+
+      if (!username || !token || !threadId) {
+        alert("Completa todos los campos para conectar");
+        return;
+      }
+
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('chat').style.display = 'flex';
+
+      pollMessages();
+    };
+
+    async function pollMessages() {
+      try {
+        const url = `https://acs-ansv-chat.unitedstates.communication.azure.com/chat/threads/${encodeURIComponent(threadId)}/messages?api-version=2021-09-07`;
+        const resp = await fetch(url, { headers: headers() });
+        if (!resp.ok) throw new Error(`Error al obtener mensajes: ${resp.status}`);
+
+        const data = await resp.json();
+        const container = document.getElementById('messages');
+        let newMessages = 0;
+
+        for (const msg of data.value) {
+          if (lastMessageIds.has(msg.id)) continue;
+          lastMessageIds.add(msg.id);
+
+          const senderId = msg.senderCommunicationIdentifier?.rawId || 'Desconocido';
+          const isBot = senderId.includes('bot') || senderId === username.toLowerCase();
+
+          const div = document.createElement('div');
+          div.className = isBot ? 'msg bot' : 'msg user';
+          div.textContent = `${msg.senderDisplayName || senderId}: ${msg.content.message}`;
+          container.appendChild(div);
+          newMessages++;
+        }
+
+        if (newMessages > 0) {
+          container.scrollTop = container.scrollHeight;
+        }
+
+      } catch (e) {
+        console.error("Error en pollMessages:", e);
+      }
+
+      setTimeout(pollMessages, 3000);
+    }
+
+    document.getElementById('btnSend').onclick = async () => {
+      const textArea = document.getElementById('msgInput');
+      const message = textArea.value.trim();
+      if (!message) return;
+
+      const sendUrl = `https://acs-ansv-chat.unitedstates.communication.azure.com/chat/threads/${encodeURIComponent(threadId)}/messages?api-version=2021-09-07`;
+      const body = {
+        content: message,
+        senderDisplayName: username,
+        type: "text"
+      };
+
+      try {
+        const resp = await fetch(sendUrl, {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify(body)
+        });
+        if (!resp.ok) throw new Error(`Error al enviar mensaje: ${resp.status}`);
+
+        textArea.value = "";
+      } catch (e) {
+        alert("Error al enviar mensaje: " + e.message);
+      }
+    };
+  </script>
+</body>
+</html>

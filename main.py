@@ -4,10 +4,27 @@ from typing import Dict
 from fastapi.responses import HTMLResponse
 from datetime import datetime
 import os
+from router import acs, communication, acs_bot, acs_tokens, acs_videocall
+from dotenv import load_dotenv
+load_dotenv()
+
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+#  # Asegúrate de que estos módulos existan y estén correctamente definidos
+ # importar el nuevo módulo
+
+
+
+
 
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+#endpoint = os.getenv("AZURE_COMMUNICATION_ENDPOINT")
 
 app = FastAPI()
+
+
 
 # Permitir CORS (ajustar orígenes según frontend)
 # app.add_middleware(
@@ -28,6 +45,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(acs.router)  # incluir el router de ACS
+app.include_router(communication.router)  # incluir el router de comunicación
+app.include_router(acs_bot.router)  # incluir el router del bot de ACS
+app.include_router(acs_tokens.router, prefix="/acs")
+app.include_router(acs_videocall.router)  # incluir el router de videollamadas de ACS
+
+
 
 # Estructura para guardar conexiones: { sala_id: { user_id: websocket } }
 rooms: Dict[str, Dict[str, WebSocket]] = {}
@@ -109,3 +134,22 @@ async def clivox_status():
         </body>
     </html>
     """
+
+@app.post("/acs/token")
+def generate_acs_token():
+    conn_str = os.getenv("ACS_CONNECTION_STRING")
+    if not conn_str:
+        return {"error": "ACS_CONNECTION_STRING not configured."}
+
+    client = CommunicationIdentityClient.from_connection_string(conn_str)
+
+    # Crear nuevo usuario + token con permiso VOIP (llamadas)
+    token_response = client.create_user_and_token(scopes=["voip"])
+    identity = token_response[0]
+    token = token_response[1]
+
+    return {
+        "user_id": identity.properties["id"],
+        "token": token.token,
+        "expires_on": token.expires_on.isoformat()
+    }
