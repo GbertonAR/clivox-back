@@ -1,0 +1,37 @@
+Estructura del proyecto: C:\GBerton2025\Desarrollos\clivox\clivox-back
+--------------------------------------------------
+
+clivox-back/
+├── .env
+├── .gitignore
+├── ai_assistant.py
+├── auth.py
+├── bot_listener.py
+├── clivox.db
+├── estructura.py
+├── main.py
+├── models.py
+├── project_structure.txt
+├── requirements.txt
+├── salas.py
+├── ws_signaling vi.py
+├── ws_signaling.py
+├── .github/
+    ├── workflows/
+        ├── main_clivox-backend.yml
+├── public/
+    ├── alumno.html
+├── router/
+    ├── acs.py
+    ├── acs_bot.py
+    ├── acs_tokens.py
+    ├── acs_videocall.py
+    ├── admin_crud.py
+    ├── auth.py
+    ├── communication.py
+    ├── dashboard_stats.py
+    ├── llamada_eventos.py
+    ├── __init__.py
+├── utils/
+    ├── acs/
+        ├── crar_sala_acs.js

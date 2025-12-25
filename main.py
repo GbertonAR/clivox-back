@@ -4,7 +4,13 @@ from typing import Dict
 from fastapi.responses import HTMLResponse
 from datetime import datetime
 import os
-from router import acs, communication, acs_bot, acs_tokens, acs_videocall
+from router import acs, communication, acs_bot, acs_tokens, acs_videocall, llamada_eventos
+from router import dashboard_stats, admin_crud, instructores_router
+from router import auth_mail, auth_qr, auth, auth_qr_logic, salas_routes, salas_pendientes, organizaciones, lms_engine
+from data import  ubicacion, perfil  # ✅ tu nuevo archivo
+from data.perfil import UsuarioPerfil  # ✅ importar el modelo de perfil
+#from data import sala_routes
+from sqlite3 import connect
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -40,7 +46,11 @@ app = FastAPI()
 # )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    #allow_origins=allowed_origins,
+    allow_origins=[
+         "http://localhost:8000",
+         "http://localhost:5174",
+         "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,6 +61,22 @@ app.include_router(communication.router)  # incluir el router de comunicación
 app.include_router(acs_bot.router)  # incluir el router del bot de ACS
 app.include_router(acs_tokens.router, prefix="/acs")
 app.include_router(acs_videocall.router)  # incluir el router de videollamadas de ACS
+app.include_router(llamada_eventos.router)  # incluir el router de eventos de llamadas
+app.include_router(dashboard_stats.router) # incluir el router de estadísticas del dashboard
+#app.include_router(admin_crud.router, prefix="/api/admin-crud")
+app.include_router(admin_crud.router)
+app.include_router(auth_mail.router)
+app.include_router(auth_qr.router)
+app.include_router(auth.router)
+app.include_router(auth_qr_logic.router)
+app.include_router(instructores_router.router) # incluir el router de instructores
+app.include_router(perfil.router)
+app.include_router(ubicacion.router)
+#app.include_router(salas_routes.router)  # incluir el router de salas
+app.include_router(salas_routes.router)  # incluir el router de
+app.include_router(salas_pendientes.router)
+app.include_router(organizaciones.router)
+app.include_router(lms_engine.router)
 
 
 
@@ -92,6 +118,40 @@ async def websocket_endpoint(websocket: WebSocket, role: str, sala_id: str, user
 
         if not rooms[sala_id]:
             del rooms[sala_id]
+            
+@app.post("/acs/token")
+def generate_acs_token():
+    conn_str = os.getenv("ACS_CONNECTION_STRING")
+    if not conn_str:
+        return {"error": "ACS_CONNECTION_STRING not configured."}
+
+    client = CommunicationIdentityClient.from_connection_string(conn_str)
+
+    # Crear nuevo usuario + token con permiso VOIP (llamadas)
+    token_response = client.create_user_and_token(scopes=["voip"])
+    identity = token_response[0]
+    token = token_response[1]
+
+    return {
+        "user_id": identity.properties["id"],
+        "token": token.token,
+        "expires_on": token.expires_on.isoformat()
+    }
+    
+    
+@app.get("/dashboard/stats")
+def get_dashboard_stats():
+    conn = connect("clivox.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT evento, COUNT(*) FROM llamada_eventos GROUP BY evento")
+    eventos = [{"evento": row[0], "cantidad": row[1]} for row in cursor.fetchall()]
+
+    cursor.execute("SELECT sala_id, COUNT(*) FROM llamada_eventos GROUP BY sala_id")
+    llamadas = [{"sala_id": row[0], "cantidad": row[1]} for row in cursor.fetchall()]
+
+    conn.close()
+    return {"eventos": eventos, "llamadas": llamadas}               
 
 @app.get("/", response_class=HTMLResponse)
 async def clivox_status():
@@ -135,21 +195,6 @@ async def clivox_status():
     </html>
     """
 
-@app.post("/acs/token")
-def generate_acs_token():
-    conn_str = os.getenv("ACS_CONNECTION_STRING")
-    if not conn_str:
-        return {"error": "ACS_CONNECTION_STRING not configured."}
-
-    client = CommunicationIdentityClient.from_connection_string(conn_str)
-
-    # Crear nuevo usuario + token con permiso VOIP (llamadas)
-    token_response = client.create_user_and_token(scopes=["voip"])
-    identity = token_response[0]
-    token = token_response[1]
-
-    return {
-        "user_id": identity.properties["id"],
-        "token": token.token,
-        "expires_on": token.expires_on.isoformat()
-    }
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

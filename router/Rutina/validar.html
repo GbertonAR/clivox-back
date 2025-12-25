@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Validación de Cuenta</title>
+  <link rel="stylesheet" href="/static/registro.css">
+  <style>
+    .validacion-container {
+      max-width: 600px;
+      margin: 80px auto;
+      background-color: #f4f4f4;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      font-family: sans-serif;
+    }
+    .success { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="validacion-container">
+    <h2>🔐 Verificación de Cuenta</h2>
+    <p class="{{ status }}">{{ mensaje }}</p>
+  </div>
+</body>
+</html>
+
+

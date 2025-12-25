@@ -1,0 +1,21 @@
+<!-- data/templates/validar_codigo.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validación de Código</title>
+  <link rel="stylesheet" href="/static/css/auth.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <h2>📩 Ingresá el código que te enviamos</h2>
+    <form id="codigo-form">
+      <input type="text" name="codigo" placeholder="Código de 6 caracteres" maxlength="6" required />
+      <button type="submit">Validar acceso</button>
+    </form>
+    <p id="mensaje" class="mensaje"></p>
+  </div>
+  <script src="/static/js/codigo.js"></script>
+</body>
+</html>

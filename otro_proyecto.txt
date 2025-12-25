@@ -1,0 +1,91 @@
+Estructura del proyecto: C:\GBerton2025\Desarrollos\clivox\clivox-front
+--------------------------------------------------
+
+clivox-front/
+├── .gitignore
+├── debugcli.html
+├── estructura.txt
+├── test.html
+├── .github/
+    ├── workflows/
+        ├── azure-static-web-apps-ambitious-mud-0ea164e1e.yml
+├── clivox/
+├── clivox-btn/
+├── clivox-diag/
+├── clivox-mvp-react/
+    ├──  - copia.env
+    ├── .env
+    ├── .gitignore
+    ├── components.json
+    ├── eslint.config.js
+    ├── index - copia.html
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.js
+    ├── README.md
+    ├── tailwind.config.js
+    ├── tsconfig.app.json
+    ├── tsconfig.json
+    ├── tsconfig.node.json
+    ├── vite.config.ts
+    ├── public/
+        ├── vite.svg
+        ├── img/
+            ├── logo.png
+            ├── test1.jpg
+    ├── src/
+        ├── App.css
+        ├── App.tsx
+        ├── index.css
+        ├── main.tsx
+        ├── vite-env.d.ts
+        ├── assets/
+            ├── react.svg
+        ├── components/
+            ├── admin/
+                ├── CrudManager.tsx
+                ├── DashboardConfig.tsx
+            ├── auth/
+            ├── ui/
+                ├── button.tsx
+                ├── toast-provider.tsx
+                ├── toast.tsx
+                ├── use-toast.ts
+        ├── lib/
+            ├── utils.ts
+        ├── pages/
+            ├── ACSCliente.tsx
+            ├── ACSInstructor.tsx
+            ├── AdminDashboard.tsx
+            ├── client 0407.tsx
+            ├── Client.tsx
+            ├── Dashboard.tsx
+            ├── home viejo.css
+            ├── home viejo.tsx
+            ├── home.css
+            ├── Home.tsx
+            ├── Instructor 0607.tsx
+            ├── instructor nuevo.tsx
+            ├── Instructor NUevo0407.tsx
+            ├── instructor Nuevo0407a.tsx
+            ├── Instructor.tsx
+            ├── login.tsx
+            ├── register.tsx
+            ├── verificarcodigo.tsx
+            ├── VideoCall.tsx
+            ├── videollamadas.tsx
+            ├── _instructor.tsx
+    ├── static/
+        ├── css/
+            ├── login.css
+        ├── img/
+            ├── login-bg.png
+    ├── templates/
+        ├── login.html
+    ├── utils/
+        ├── acs/
+            ├── crar_sala_acs.js
+├── src/
+    ├── components/
+        ├── VideoRoom.tsx

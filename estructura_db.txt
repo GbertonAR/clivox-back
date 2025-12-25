@@ -1,0 +1,183 @@
+📋 ESTRUCTURA DE LA BASE DE DATOS
+
+🧱 Tabla: Provincias
+   - ID (INTEGER) [PK]
+   - Nombre (TEXT)
+
+🧱 Tabla: Municipios
+   - ID (INTEGER) [PK]
+   - Nombre (TEXT)
+   - Id_Provincia (INTEGER)
+   - Mail_Institucional (TEXT)
+
+🧱 Tabla: DatosDeCanje
+   - id (INTEGER) [PK]
+   - fecha_ingreso (TEXT)
+   - estado (TEXT)
+   - dni (TEXT)
+   - apellido (TEXT)
+   - nombre (TEXT)
+   - psicofisico_apellido (TEXT)
+   - psicofisico_nombre (TEXT)
+   - psicofisico_categoria (TEXT)
+   - psicofisico_f_examen (TEXT)
+   - psicofisico_f_dictamen (TEXT)
+   - psicofisico_dni (TEXT)
+   - psicofisico_imagen (TEXT)
+   - curso_nombre (TEXT)
+   - curso_apellido (TEXT)
+   - curso_dni (TEXT)
+   - curso_imagen (TEXT)
+   - legalidad_nombre (TEXT)
+   - legalidad_apellido (TEXT)
+   - legalidad_dni (TEXT)
+   - legalidad_imagen (TEXT)
+   - provincia_id (INTEGER)
+   - municipio_id (INTEGER)
+   - ciudadano_presencial (TEXT)
+   - frente_dni_imagen (TEXT)
+   - dorso_dni_imagen (TEXT)
+   - licencia_frente_imagen (TEXT)
+   - licencia_dorso_imagen (TEXT)
+   - linti_imagen (TEXT)
+   - curso_certificado_imagen (TEXT)
+   - psicofisico_prestador (TEXT)
+   - legalidad_certificado_imagen (TEXT)
+   - numero_de_tramite (TEXT)
+   - imagen_qr (TEXT)
+   - fecha_no_presencial (TEXT)
+   - solicita_licencia_extendida (TEXT)
+   - linti_nombre (TEXT)
+   - linti_apellido (TEXT)
+   - linti_dni (TEXT)
+   - linti_f_vto (TEXT)
+   - linti_categoria (TEXT)
+
+🧱 Tabla: roles
+   - id (INTEGER) [PK]
+   - nombre_rol (TEXT)
+   - descripcion (TEXT)
+
+🧱 Tabla: usuarios
+   - id (TEXT) [PK]
+   - nombre (TEXT)
+   - email (TEXT)
+   - celular (TEXT)
+   - id_municipio (INTEGER)
+   - fecha_registro (DATETIME)
+   - id_rol (INTEGER)
+   - token_validacion (TEXT)
+   - apellido (TEXT)
+   - cuil (TEXT)
+
+🧱 Tabla: interacciones_log
+   - id (INTEGER) [PK]
+   - id_usuario (TEXT)
+   - timestamp_consulta (DATETIME)
+   - tipo_consulta (TEXT)
+   - texto_consulta (TEXT)
+   - timestamp_respuesta (DATETIME)
+   - texto_respuesta (TEXT)
+   - tiempo_respuesta_ms (INTEGER)
+   - modelo_ia_usado (TEXT)
+   - relevancia_ia (INTEGER)
+   - uuid_sesion (TEXT)
+   - ip_usuario (TEXT)
+   - es_desde_search (BOOLEAN)
+   - url_valida (BOOLEAN)
+   - feedback_usuario (INTEGER)
+
+🧱 Tabla: tickets
+   - id (INTEGER) [PK]
+   - id_usuario (TEXT)
+   - asunto (TEXT)
+   - descripcion (TEXT)
+   - fecha_creacion (DATETIME)
+   - estado (TEXT)
+   - prioridad (TEXT)
+   - id_agente_asignado (TEXT)
+   - fecha_cierre (DATETIME)
+   - comentarios_cierre (TEXT)
+
+🧱 Tabla: parametros_seteos
+   - id (INTEGER) [PK]
+   - nombre_parametro (TEXT)
+   - valor_parametro (TEXT)
+   - valor (TEXT)
+   - tipo_dato (TEXT)
+   - descripcion (TEXT)
+   - ultima_modificacion (DATETIME)
+
+🧱 Tabla: codigos_verificacion
+   - id (INTEGER) [PK]
+   - email (TEXT)
+   - codigo (TEXT)
+   - timestamp (DATETIME)
+   - usado (INTEGER)
+   - timestamp_validado (DATETIME)
+
+🧱 Tabla: notificaciones
+   - id (INTEGER) [PK]
+   - titulo (TEXT)
+   - mensaje (TEXT)
+   - fecha_envio (DATETIME)
+   - emisor (TEXT)
+   - destinatarios (TEXT)
+   - leido_por (TEXT)
+
+🧱 Tabla: temas_permitidos
+   - id (INTEGER) [PK]
+   - tema (TEXT)
+
+🧱 Tabla: llamada_eventos
+   - id (INTEGER) [PK]
+   - user_id (TEXT)
+   - sala_id (TEXT)
+   - evento (TEXT)
+   - timestamp (DATETIME)
+
+🧱 Tabla: capacitaciones
+   - id (INTEGER) [PK]
+   - titulo (TEXT)
+   - fecha_inicio (DATETIME)
+   - fecha_fin (DATETIME)
+   - id_instructor (TEXT)
+   - destinado_a (TEXT)
+   - temario (TEXT)
+   - cupo_maximo (INTEGER)
+   - con_examen (BOOLEAN)
+   - link_sala (TEXT)
+   - provincias (TEXT)
+   - municipios (TEXT)
+   - documentacion (TEXT)
+
+🧱 Tabla: inscripciones
+   - id (INTEGER) [PK]
+   - id_usuario (TEXT)
+   - id_capacitacion (INTEGER)
+   - fecha_inscripcion (DATETIME)
+   - confirmado (BOOLEAN)
+   - en_lista_espera (BOOLEAN)
+
+🧱 Tabla: asistencias
+   - id (INTEGER) [PK]
+   - id_usuario (TEXT)
+   - id_capacitacion (INTEGER)
+   - ingreso (DATETIME)
+   - egreso (DATETIME)
+
+🧱 Tabla: examenes
+   - id (INTEGER) [PK]
+   - id_usuario (TEXT)
+   - id_capacitacion (INTEGER)
+   - puntaje (INTEGER)
+   - aprobado (BOOLEAN)
+   - fecha (DATETIME)
+
+🧱 Tabla: certificados_emitidos
+   - id (INTEGER) [PK]
+   - id_usuario (TEXT)
+   - id_capacitacion (INTEGER)
+   - ruta_certificado (TEXT)
+   - fecha_emision (DATETIME)
+

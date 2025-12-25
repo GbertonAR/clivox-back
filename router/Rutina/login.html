@@ -1,0 +1,28 @@
+<!-- data/templates/login.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ingreso al Asistente ANSV</title>
+  <link rel="stylesheet" href="/static/css/auth.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <h2>🔐 Ingresá tu email para acceder</h2>
+    <form id="login-form">
+      <input type="email" name="email" placeholder="Tu correo electrónico" required />
+      <button type="submit">Enviar código</button>
+    </form>
+    <p id="mensaje" class="mensaje"></p>
+    <p class="enlace-registro">¿No tenés cuenta? <a href="/registro">Registrate aquí</a></p>
+  </div>
+  <script src="/static/js/login.js"></script>
+</body>
+</html>
+
+
+
+
+
+
