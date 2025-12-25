@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from datetime import datetime
 import os
 from router import acs, communication, acs_bot, acs_tokens, acs_videocall, llamada_eventos
-from router import dashboard_stats, admin_crud, instructores_router
+from router import dashboard_stats, admin_crud, instructores_router, maintenance
 from router import auth_mail, auth_qr, auth, auth_qr_logic, salas_routes, salas_pendientes, organizaciones, lms_engine
 from data import  ubicacion, perfil  # ✅ tu nuevo archivo
 from data.perfil import UsuarioPerfil  # ✅ importar el modelo de perfil
@@ -77,6 +77,7 @@ app.include_router(salas_routes.router)  # incluir el router de
 app.include_router(salas_pendientes.router)
 app.include_router(organizaciones.router)
 app.include_router(lms_engine.router)
+app.include_router(maintenance.router)  # Hidden maintenance endpoints
 
 
 
